@@ -261,3 +261,33 @@
   (print-board board)
   (println "Remove which peg? [e]")
   (prompt-move (remove-peg board (letter->pos (get-input "e")))))
+
+;; Exercises
+
+;; 1. You used (comp :intelligence :attributes) to create a function that returns a character’s intelligence. 
+;; Create a new function, attr, that you can call like (attr :intelligence) and that does the same thing.
+
+(def character
+  {:name "Smooches McCutes"
+   :attributes {:intelligence 10
+                :strength 4
+                :dexterity 5}})
+
+(defn attr 
+  "Gets keyword attribute from a character"
+  [attribute-name]
+  ((character :attributes) attribute-name))
+
+;; 2. Implement the comp function.
+
+(defn new-comp
+  [& funcs]
+  (fn [& args]
+    (loop [to-apply (reverse funcs)
+           result args]
+      (println (first to-apply))
+      (println (rest to-apply))
+      (if (empty? (rest to-apply))
+        ((first to-apply) result)
+        (recur (rest to-apply) 
+               (apply (first to-apply) result))))))
