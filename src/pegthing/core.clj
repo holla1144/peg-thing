@@ -283,11 +283,40 @@
 (defn new-comp
   [& funcs]
   (fn [& args]
-    (loop [to-apply (reverse funcs)
-           result args]
-      (println (first to-apply))
-      (println (rest to-apply))
-      (if (empty? (rest to-apply))
-        ((first to-apply) result)
-        (recur (rest to-apply) 
-               (apply (first to-apply) result))))))
+    (let [to-apply (reverse funcs)
+          starter-result (apply (first to-apply) args)]
+      (println to-apply)
+      (loop [iter-arr to-apply
+             result starter-result]
+        (if (empty? (rest iter-arr))
+          result
+          (recur (rest to-apply)
+                 ((first (rest to-apply)) result)))))))
+
+;; Implement the assoc-in function. Hint: use the assoc function and define its parameters as [m [k & ks] v].
+
+;; example: (assoc-in {} [:cookie :monster :vocals] "Finntroll") yields {:cookie {:monster {:vocals "Finntroll"}}}
+
+(defn new-assoc-in
+  "Clone of assoc-in"
+  [map arr-of-fields value]
+  (let [fields (reverse arr-of-fields)
+        deepest-assoc (assoc {} (first fields) value)]
+    (loop [iter (rest fields)
+           result deepest-assoc]
+      (if (empty? (rest iter))
+        (assoc map (first iter) result)
+        (recur (rest iter) (assoc {} (first iter) result))))))
+
+;; 3. implement update-in 
+;; ex. (def users [{:name "James" :age 26}  {:name "John" :age 43}]) 
+;;     (update-in users [1 :age] inc) yields [{:name "James", :age 26} {:name "John", :age 44}]
+
+(defn new-update-in
+  [map keys func & args]
+  (let [val (get-in map keys)
+        updater-func (fn ([] (func val))
+                         ([args] (apply func val args)))
+        updated-val (updater-func args)
+        ]
+    (assoc-in map keys updated-val)))
